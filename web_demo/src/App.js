@@ -1,24 +1,30 @@
-import logo from './logo.svg';
+import { Layout, Menu, Breadcrumb } from 'antd';
 import './App.css';
+
+const { Header, Content, Footer } = Layout;
+
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout className="layout">
+      <Header style={{ "backgroundColor": "white" }}>
+        <Menu theme="light" mode="horizontal">
+          <Menu.Item key="home">
+            <a href="/">
+              Time-CAD
+            </a>
+          </Menu.Item>
+        </Menu>
+      </Header>
+      <Content style={{ padding: '0 50px' }}>
+        <br />
+        <div className="site-layout-content">
+          Content
+        </div>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}><em>Time-CAD</em> © 2022 Created by <a href="https://dm.kaist.ac.kr">KAIST Data Mining Lab</a></Footer>
+    </Layout>
   );
 }
 
