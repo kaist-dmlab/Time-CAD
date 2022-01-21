@@ -1,29 +1,27 @@
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu } from 'antd';
+import MainViewer from './components/MainViewer'
+import Uploader from './components/Uploader'
+import logo from './logo.png'
 import './App.css';
 
 const { Header, Content, Footer } = Layout;
-
-
+let upload = true
 
 function App() {
   return (
     <Layout className="layout">
       <Header style={{ "backgroundColor": "white" }}>
-        <Menu theme="light" mode="horizontal">
-          <Menu.Item key="home">
-            <a href="/">
-              Time-CAD
-            </a>
-          </Menu.Item>
-        </Menu>
+        <a href="/" className='menu-url'><div className='logo'></div>Time-CAD</a>
       </Header>
       <Content style={{ padding: '0 50px' }}>
         <br />
         <div className="site-layout-content">
-          Content
+          {
+            upload ? <MainViewer /> : <Uploader />
+          }
         </div>
       </Content>
-      <Footer style={{ textAlign: 'center' }}><em>Time-CAD</em> © 2022 Created by <a href="https://dm.kaist.ac.kr">KAIST Data Mining Lab</a></Footer>
+      <Footer style={{ textAlign: 'center' }}><em>Time-CAD</em> © 2022 Created by <a target='_blank' href="https://dm.kaist.ac.kr">KAIST Data Mining Lab</a></Footer>
     </Layout>
   );
 }
