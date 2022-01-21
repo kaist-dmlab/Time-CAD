@@ -1,11 +1,10 @@
-import { Layout, Menu } from 'antd';
+import { Layout } from 'antd';
 import MainViewer from './components/MainViewer'
 import Uploader from './components/Uploader'
-import logo from './logo.png'
 import './App.css';
 
 const { Header, Content, Footer } = Layout;
-let upload = true
+let upload = false
 
 function App() {
   return (

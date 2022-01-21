@@ -1,5 +1,5 @@
 .site-layout-content {
-  min-height: 100%;
+  min-height: 90vh;
 }
 
 .logo {
@@ -30,4 +30,10 @@
 
 .ant-checkbox + span {
   font-size: 20px;
+}
+
+.ant-upload.ant-upload-drag {
+  height: 640px;
+  border-width: 2px;
+  border-radius: 8px;
 }
