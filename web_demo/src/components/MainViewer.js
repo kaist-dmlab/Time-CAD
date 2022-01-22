@@ -53,10 +53,6 @@ export default ({ chartData }) => {
         setCurrentRange(value)
     }
 
-    const onAddData = value => {
-
-    }
-
     return (
         <React.Fragment>
             <Col span={4}>
