@@ -1,80 +1,98 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react'
-import { Card, Col, Row, PageHeader, Button, Divider, Select, Checkbox, message } from 'antd';
-import { PlusOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Card, Col, Row, Divider, Select, Checkbox } from 'antd';
+import { CalendarOutlined } from '@ant-design/icons';
 import Charts from './Charts'
 
 const { Option } = Select;
 const CheckboxGroup = Checkbox.Group;
 
-function handleChange(value) {
-    message.info(`selected ${value}`);
-}
+export default ({ chartData }) => {
 
-export default props => {
-    let plainOptions = ['Column A', 'Column B', 'Column C'];
-    let current_range = 'all'
+    const [chartVariables, setChartVariables] = React.useState([])
+    const [checkedList, setCheckedList] = React.useState(chartVariables);
+    const [currentRange, setCurrentRange] = React.useState('all');
+    const [indeterminate, setIndeterminate] = React.useState(false);
+    const [checkAll, setCheckAll] = React.useState(true);
+    const [displayData, setDisplayData] = React.useState(chartData)
 
-    const [checkedList, setCheckedList] = React.useState(plainOptions);
-    const [indeterminate, setIndeterminate] = React.useState(true);
-    const [checkAll, setCheckAll] = React.useState(false);
 
-    const onChange = list => {
+    React.useEffect(() => {
+        let variables = new Set()
+        for (const data of chartData) {
+            variables.add(data.column)
+        }
+        setChartVariables(Array.from(variables))
+        setCheckedList(Array.from(variables))
+    }, [chartData]);
+
+    const onVariableChange = list => {
         setCheckedList(list);
-        setIndeterminate(!!list.length && list.length < plainOptions.length);
-        setCheckAll(list.length === plainOptions.length);
+        setIndeterminate(!!list.length && list.length < chartVariables.length);
+        setCheckAll(list.length === chartVariables.length);
+
+        let newChartData = chartData.filter(data => list.includes(data.column))
+        setDisplayData(newChartData)
     };
 
     const onCheckAllChange = e => {
-        setCheckedList(e.target.checked ? plainOptions : []);
+        setCheckedList(e.target.checked ? chartVariables : []);
         setIndeterminate(false);
         setCheckAll(e.target.checked);
+
+        if (e.target.checked) {
+            let newChartData = chartData.filter(data => chartVariables.includes(data.column))
+            setDisplayData(newChartData)
+        } else {
+            let newChartData = chartData.filter(data => !chartVariables.includes(data.column))
+            setDisplayData(newChartData)
+        }
     };
+
+    const onRangeChange = value => {
+        setCurrentRange(value)
+    }
+
+    const onAddData = value => {
+
+    }
 
     return (
         <React.Fragment>
-            <PageHeader
-                title="Anomaly Detection Results"
-                extra={[
-                    <Button size='large' key="new_data" type="primary" shape='round'><PlusOutlined />New Data</Button>,
-                ]} />
-            <Row gutter={16}>
-                <Col span={4}>
-                    <Card bordered={false}>
-                        <a href="#">filename</a>
-                        <Divider orientation='left'>Variable Filter</Divider>
-                        <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
-                            Check all
-                        </Checkbox>
-                        <CheckboxGroup style={{ width: '100%' }} value={checkedList} onChange={onChange}>
-                            <Row>
-                                {
-                                    plainOptions.map(option =>
-                                        <Col span={24}>
-                                            <Checkbox value={option}>{option}</Checkbox>
-                                        </Col>
-                                    )
-                                }
-                            </Row>
-                        </CheckboxGroup>
-                    </Card>
-                </Col>
-                <Col span={20}>
-                    <Card bordered={false}
-                        extra={
-                            <Select defaultValue={current_range} style={{ width: 172, fontWeight: 'bold' }} onChange={handleChange}>
-                                <Option value="all"><CalendarOutlined /> All</Option>
-                                <Option value="7d"><CalendarOutlined /> Last 7 days</Option>
-                                <Option value="31d"><CalendarOutlined /> Last 31 days</Option>
-                                <Option value="3m"><CalendarOutlined /> Last 3 months</Option>
-                                <Option value="6m"><CalendarOutlined /> Last 6 months</Option>
-                                <Option value="12m"><CalendarOutlined /> Last 12 months</Option>
-                            </Select>
-                        }>
-                        <Charts />
-                    </Card>
-                </Col>
-            </Row>
-        </React.Fragment>
+            <Col span={4}>
+                <Card bordered={false}>
+                    <Divider orientation='left'>Variable Filter</Divider>
+                    <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
+                        Show All
+                    </Checkbox>
+                    <CheckboxGroup style={{ width: '100%' }} value={checkedList} onChange={onVariableChange}>
+                        <Row>
+                            {
+                                chartVariables.map((option, i) =>
+                                    <Col key={i} span={24}>
+                                        <Checkbox key={i} value={option}>{option}</Checkbox>
+                                    </Col>
+                                )
+                            }
+                        </Row>
+                    </CheckboxGroup>
+                </Card>
+            </Col>
+            <Col span={20}>
+                <Card title={<a>Filename</a>} bordered={false} // TODO: click to show data table
+                    extra={
+                        <Select defaultValue={currentRange} style={{ width: 172, fontWeight: 'bold' }} onChange={onRangeChange}>
+                            <Option key='all' value="all"><CalendarOutlined /> All</Option>
+                            <Option key='7d' value="7d"><CalendarOutlined /> Last 7 days</Option>
+                            <Option key='31d' value="31d"><CalendarOutlined /> Last 31 days</Option>
+                            <Option key='3m' value="3m"><CalendarOutlined /> Last 3 months</Option>
+                            <Option key='6m' value="6m"><CalendarOutlined /> Last 6 months</Option>
+                            <Option key='12m' value="12m"><CalendarOutlined /> Last 12 months</Option>
+                        </Select>
+                    }>
+                    <Charts chartData={displayData} setCheckedList={setCheckedList} />
+                </Card>
+            </Col>
+        </React.Fragment >
     )
 }
