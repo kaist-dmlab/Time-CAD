@@ -4,6 +4,7 @@ import { DualAxes } from '@ant-design/charts';
 
 export default ({ chartData, setCheckedList }) => {
     const [data, setData] = React.useState([])
+    const [anomMarkers, setAnomMarkers] = React.useState([])
 
     // const onPlotReady = (plot) => {
     //     plot.on('legend-item:click', ({ view }) => {
@@ -15,6 +16,8 @@ export default ({ chartData, setCheckedList }) => {
     // };
 
     React.useEffect(() => {
+        let anomalous_markers = []
+        setAnomMarkers(anomalous_markers)
         setData(chartData)
     }, [chartData]);
 
@@ -27,6 +30,16 @@ export default ({ chartData, setCheckedList }) => {
                 text: 'Date'
             },
             type: 'time',
+            tickMethod: 'time',
+            tickCount: data.length / 12,
+            tickLine: {
+                alignTick: true
+            },
+            label: {
+                autoRotate: true,
+                autoHide: false,
+                autoEllipsis: false,
+            },
         },
         yAxis: {
             value: {
@@ -71,7 +84,8 @@ export default ({ chartData, setCheckedList }) => {
                         position: 'start',
                         autoRotate: false,
                         style: {
-                            fill: 'red'
+                            fill: 'red',
+                            fontWeight: 700
                         }
                     },
                     style: {
@@ -79,9 +93,9 @@ export default ({ chartData, setCheckedList }) => {
                         lineDash: [3, 3],
                         stroke: 'red'
                     }
-                },
+                }
             ]
-        }
+        },
     };
 
     return (

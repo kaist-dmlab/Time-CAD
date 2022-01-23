@@ -3,7 +3,6 @@ import { Layout } from 'antd';
 import ViewWrapper from './components/ViewWrapper'
 import Uploader from './components/Uploader'
 import './App.css';
-import data1 from './chart_data/data1.json'
 
 const { Header, Content, Footer } = Layout;
 
@@ -13,15 +12,9 @@ function App() {
 
   const [upload, setUpload] = React.useState(false);
   const [chartData, setChartData] = React.useState([]);
+  const [fileName, setFileName] = React.useState([]);
 
   // Similar to componentDidMount and componentDidUpdate:
-  React.useEffect(() => {
-    const uploadedFiles = localStorage.getItem('uploadedFiles')
-    if (uploadedFiles) {
-      setUpload(true)
-      setChartData(data1)
-    }
-  }, []);
 
   return (
     <Layout className="layout">
@@ -32,7 +25,7 @@ function App() {
         <br />
         <div className="site-layout-content">
           {
-            upload ? <ViewWrapper chartData={chartData} setChartData={setChartData}/> : <Uploader setUpload={setUpload} setChartData={setChartData}/>
+            upload ? <ViewWrapper chartData={chartData} fileName={fileName} setChartData={setChartData}/> : <Uploader setUpload={setUpload} setFileName={setFileName} setChartData={setChartData}/>
           }
         </div>
       </Content>
