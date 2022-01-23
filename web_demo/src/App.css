@@ -27,10 +27,6 @@
   color: black;
 }
 
-.ant-checkbox + span {
-  font-size: 20px;
-}
-
 .ant-upload.ant-upload-drag {
   height: 640px;
   border-width: 2px;

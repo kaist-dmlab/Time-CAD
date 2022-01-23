@@ -7,7 +7,7 @@ import Charts from './Charts'
 const { Option } = Select;
 const CheckboxGroup = Checkbox.Group;
 
-export default ({ chartData }) => {
+export default ({ chartData, fileName }) => {
 
     const [chartVariables, setChartVariables] = React.useState([])
     const [checkedList, setCheckedList] = React.useState(chartVariables);
@@ -50,17 +50,39 @@ export default ({ chartData }) => {
     };
 
     const onRangeChange = value => {
+        let newChartData = chartData.filter(data => chartVariables.includes(data.column))
+
+        switch (value) {
+            case '7d':
+                newChartData = newChartData.slice(-7 * chartVariables.length)
+                break;
+            case '31d':
+                newChartData = newChartData.slice(-31 * chartVariables.length)
+                break;
+            case '3m':
+                newChartData = newChartData.slice(-90 * chartVariables.length)
+                break;
+            case '6m':
+                newChartData = newChartData.slice(-180 * chartVariables.length)
+                break;
+            case '12m':
+                newChartData = newChartData.slice(-356 * chartVariables.length)
+                break;
+            default:
+                break;
+        }
+        setDisplayData(newChartData)
         setCurrentRange(value)
     }
 
     return (
         <React.Fragment>
             <Col span={4}>
-                <Card bordered={false}>
-                    <Divider orientation='left'>Variable Filter</Divider>
+                <Card title="Variable Filter" bordered={false} extra={
                     <Checkbox indeterminate={indeterminate} onChange={onCheckAllChange} checked={checkAll}>
                         Show All
                     </Checkbox>
+                }>
                     <CheckboxGroup style={{ width: '100%' }} value={checkedList} onChange={onVariableChange}>
                         <Row>
                             {
@@ -75,7 +97,7 @@ export default ({ chartData }) => {
                 </Card>
             </Col>
             <Col span={20}>
-                <Card title={<a>Filename</a>} bordered={false} // TODO: click to show data table
+                <Card title={"Displaying " + fileName} bordered={false} // TODO: click to show data table
                     extra={
                         <Select defaultValue={currentRange} style={{ width: 172, fontWeight: 'bold' }} onChange={onRangeChange}>
                             <Option key='all' value="all"><CalendarOutlined /> All</Option>
