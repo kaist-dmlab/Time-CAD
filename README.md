@@ -1,4 +1,4 @@
-# Time-CAD: Time-Series Anomaly Detection with Context-AwareDecomposition
+# Time-CAD: Time-Series Anomaly Detection with Context-Aware Decomposition
 
 # Requirements
 
