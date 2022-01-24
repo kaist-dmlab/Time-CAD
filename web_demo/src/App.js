@@ -14,8 +14,6 @@ function App() {
   const [chartData, setChartData] = React.useState([]);
   const [fileName, setFileName] = React.useState([]);
 
-  // Similar to componentDidMount and componentDidUpdate:
-
   return (
     <Layout className="layout">
       <Header style={{ "backgroundColor": "white" }}>

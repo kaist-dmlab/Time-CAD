@@ -4,6 +4,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
+
 @app.route('/', methods=['GET'])
 def index():
     return {
@@ -17,6 +20,20 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     # get uploaded file and return its .json version for displaying charts
+    # check if the post request has the file part
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+    file = request.files['file']
+    # If the user does not select a file, the browser submits an
+    # empty file without a filename.
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('download_file', name=filename))
     return None
 
 if __name__ == "__main__":

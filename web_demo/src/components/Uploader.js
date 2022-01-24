@@ -43,6 +43,13 @@ export default ({ setUpload, setChartData, setFileName }) => {
         },
     };
 
+    // Similar to componentDidMount and componentDidUpdate:
+    React.useEffect(() => {
+        setChartData(data1)
+        setFileName("data1.json")
+        setUpload(true)
+    }, [setChartData, setFileName, setUpload]);
+
     return (
         <React.Fragment>
             <PageHeader title="File Uploader" />
