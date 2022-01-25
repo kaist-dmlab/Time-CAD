@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react'
-import { Card, Col, Row, Divider, Select, Checkbox } from 'antd';
+import { Card, Col, Row, Select, Checkbox } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import Charts from './Charts'
 

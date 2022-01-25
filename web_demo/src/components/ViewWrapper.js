@@ -18,15 +18,30 @@ export default ({ chartData, fileName }) => {
 
     const fileProps = {
         multiple: false,
+        maxCount: 1,
+        action: 'http://localhost:5555/upload',
         beforeUpload: file => {
-            const isOkay = acceptableExts.includes(file.type)
-            if (!isOkay) {
-                message.error(`${file.name} is not a png file`);
+            const isCSV = acceptableExts.includes(file.type)
+            if (!isCSV) {
+                message.error(`${file.name} is not an acceptable file!`);
             }
-            return isOkay || Upload.LIST_IGNORE;
+            return isCSV || Upload.LIST_IGNORE;
         },
-        onChange: info => {
-            console.log(info.fileList);
+        onChange(info) {
+            const { status } = info.file;
+
+            if (status === 'done') {
+                const response = JSON.parse(info.file.xhr.response)
+                if (response.status === 200) {
+                    message.success(`${info.file.name} file uploaded successfully.`);
+                    setChartDataList([...chartDataList, response.data])
+                    setFileNameList([...fileNameList, info.file.name])
+                } else {
+                    message.error(`${info.file.name} file format is invalid.`)
+                }
+            } else if (status === 'error') {
+                message.error(`${info.file.name} file upload failed.`);
+            }
         },
     }
 
@@ -35,20 +50,15 @@ export default ({ chartData, fileName }) => {
         setFileNameList([fileName])
     }, [chartData, fileName]);
 
-    const onAddData = value => {
-        setChartDataList([...chartDataList, data2])
-        setFileNameList([...fileNameList, "data2.json"])
-    }
-
     return (
         <React.Fragment>
             <PageHeader
                 title="Anomaly Detection Results"
                 extra={[
-                    <Upload {...fileProps} accept={acceptableExts} key='add-upload'><Button size='large' key="new_data" type="primary" shape='round' onClick={onAddData}><PlusOutlined />New Data</Button></Upload>,
+                    <Upload {...fileProps} accept={acceptableExts} key='add-upload'><Button size='large' key="new_data" type="primary" shape='round'><PlusOutlined />New Data</Button></Upload>,
                 ]} />
             <Row gutter={[16, 16]}>
-                {/* TODO: Loop to create MainViewer over each chartData in chartDataList + Action on Add New Data */}
+                {/* TODO: Action on Add New Data */}
                 {console.log(chartDataList)}
                 {chartDataList.map((data, i) =>
                     <MainViewer key={i} chartData={data} fileName={fileNameList[i]} />
