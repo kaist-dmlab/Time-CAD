@@ -1,0 +1,34 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+./web_demo/node_modules
+./web_demo/.pnp
+./web_demo/.pnp.js
+./web_demo/.yarn/*
+./web_demo/.yarn/cache
+./web_demo/.yarn/patches
+./web_demo/.yarn/plugins
+./web_demo/.yarn/releases
+./web_demo/.yarn/sdks
+./web_demo/.yarn/versions
+
+# testing
+./web_demo/coverage
+
+# production
+./web_demo/build
+
+# misc
+.DS_Store
+./web_demo/.DS_Store
+./web_demo/.env.local
+./web_demo/.env.development.local
+./web_demo/.env.test.local
+./web_demo/.env.production.local
+
+./web_demo/npm-debug.log*
+./web_demo/yarn-debug.log*
+./web_demo/yarn-error.log*
+
+./server_demo/uploaded_files/*
+./server_demo/__pycache__
