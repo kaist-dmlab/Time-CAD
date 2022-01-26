@@ -1,13 +1,11 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react'
-import { Form, PageHeader, Upload, message } from 'antd';
+import { PageHeader, Upload, message } from 'antd';
 import { FileAddFilled } from '@ant-design/icons';
-
-import data1 from '../chart_data/data1.json'
 
 const { Dragger } = Upload;
 
-export default ({ setChartData, setFileName }) => {
+export default ({ setChartData, setChartVariables, setFileName }) => {
     const acceptableExts = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 
     const fileProps = {
@@ -30,6 +28,7 @@ export default ({ setChartData, setFileName }) => {
                 if (response.status === 200) {
                     message.success(`${info.file.name} file uploaded successfully.`);
                     setChartData(response.data)
+                    setChartVariables(response.columns)
                     setFileName(info.file.name)
                 } else {
                     message.error(`${info.file.name} file format is invalid.`)
@@ -46,13 +45,6 @@ export default ({ setChartData, setFileName }) => {
             }
         },
     };
-
-    // Similar to componentDidMount and componentDidUpdate:
-    // React.useEffect(() => {
-    //     setChartData(data1)
-    //     setFileName("data1.json")
-    //     setUpload(true)
-    // }, [setChartData, setFileName, setUpload]);
 
     return (
         <React.Fragment>

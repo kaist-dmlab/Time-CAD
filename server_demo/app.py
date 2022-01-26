@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from file_processor import preprocess_uploaded_file
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/upload": {"origins": "http://localhost:3000"}})
 
 ALLOWED_EXTENSIONS = {'csv', 'xls', 'xlsx'}
 
@@ -25,7 +25,7 @@ def allowed_file(filename):
 
 
 @app.route('/upload', methods=['POST'])
-def upload_file():    
+def upload_file():
     if 'file' not in request.files:
         flash('No file part')
         return redirect(request.url)

@@ -19,9 +19,12 @@ def preprocess_uploaded_file(filepath):
         return {'status': 200, 'data': chart_data}
     elif filepath.split('.')[-1] == 'csv':
         df = pd.read_csv(filepath)
+        
+        df['anomaly_scores'] = np.random.random(size=df.shape[0])
+        
         chart_data = json.loads(df.to_json(orient='records'))
         os.remove(filepath)
-        return {'status': 200, 'data': chart_data}
+        return {'status': 200, 'data': chart_data, 'columns': df.columns.tolist()[1:]}
     else:
         return {'status': 400, 'message': 'upsupported file type'}
 
