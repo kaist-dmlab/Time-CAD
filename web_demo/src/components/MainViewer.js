@@ -7,31 +7,27 @@ import Charts from './Charts'
 const { Option } = Select;
 const CheckboxGroup = Checkbox.Group;
 
-export default ({ chartData, fileName }) => {
+export default (props) => {
 
-    const [chartVariables, setChartVariables] = React.useState([])
-    const [checkedList, setCheckedList] = React.useState(chartVariables);
+    const [chartVariables, setChartVariables] = React.useState(props.chartVariables)
+    const [checkedList, setCheckedList] = React.useState(props.chartVariables);
     const [currentRange, setCurrentRange] = React.useState('all');
     const [indeterminate, setIndeterminate] = React.useState(false);
     const [checkAll, setCheckAll] = React.useState(true);
-    const [displayData, setDisplayData] = React.useState(chartData)
+    const [displayData, setDisplayData] = React.useState(props.chartData)
 
 
     React.useEffect(() => {
-        let variables = new Set()
-        for (const data of chartData) {
-            variables.add(data.column)
-        }
-        setChartVariables(Array.from(variables))
-        setCheckedList(Array.from(variables))
-    }, [chartData]);
+        setChartVariables(props.chartVariables)
+        setCheckedList(props.chartVariables)
+    }, [props.chartVariables]);
 
     const onVariableChange = list => {
         setCheckedList(list);
         setIndeterminate(!!list.length && list.length < chartVariables.length);
         setCheckAll(list.length === chartVariables.length);
 
-        let newChartData = chartData.filter(data => list.includes(data.column))
+        let newChartData = props.chartData.filter(data => list.includes(data.column))
         setDisplayData(newChartData)
     };
 
@@ -41,16 +37,16 @@ export default ({ chartData, fileName }) => {
         setCheckAll(e.target.checked);
 
         if (e.target.checked) {
-            let newChartData = chartData.filter(data => chartVariables.includes(data.column))
+            let newChartData = props.chartData.filter(data => chartVariables.includes(data.column))
             setDisplayData(newChartData)
         } else {
-            let newChartData = chartData.filter(data => !chartVariables.includes(data.column))
+            let newChartData = props.chartData.filter(data => !chartVariables.includes(data.column))
             setDisplayData(newChartData)
         }
     };
 
     const onRangeChange = value => {
-        let newChartData = chartData.filter(data => chartVariables.includes(data.column))
+        let newChartData = props.chartData.filter(data => chartVariables.includes(data.column))
 
         switch (value) {
             case '7d':
@@ -86,18 +82,18 @@ export default ({ chartData, fileName }) => {
                     <CheckboxGroup style={{ width: '100%' }} value={checkedList} onChange={onVariableChange}>
                         <Row>
                             {
-                                chartVariables.map((option, i) =>
+                                chartVariables ? chartVariables.map((option, i) =>
                                     <Col key={i} span={24}>
                                         <Checkbox key={i} value={option}>{option}</Checkbox>
                                     </Col>
-                                )
+                                ) : null
                             }
                         </Row>
                     </CheckboxGroup>
                 </Card>
             </Col>
             <Col span={20}>
-                <Card title={"Displaying " + fileName} bordered={false} // TODO: click to show data table
+                <Card title={"Displaying " + props.fileName} bordered={false} // TODO: click to show data table
                     extra={
                         <Select defaultValue={currentRange} style={{ width: 172, fontWeight: 'bold' }} onChange={onRangeChange}>
                             <Option key='all' value="all"><CalendarOutlined /> All</Option>
@@ -108,7 +104,7 @@ export default ({ chartData, fileName }) => {
                             <Option key='12m' value="12m"><CalendarOutlined /> Last 12 months</Option>
                         </Select>
                     }>
-                    <Charts chartData={displayData} setCheckedList={setCheckedList} />
+                    <Charts chartData={displayData} chartVariables={checkedList} setCheckedList={setCheckedList} />
                 </Card>
             </Col>
         </React.Fragment >

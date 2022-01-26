@@ -9,109 +9,101 @@ export default (props) => {
     const chartRef = useRef(null);
 
     useLayoutEffect(() => {
+        const data = props.chartData
+        const displayVariables = props.chartVariables
 
+        console.log(displayVariables)
+
+        // Create root element
+        // https://www.amcharts.com/docs/v5/getting-started/#Root_element
         let root = am5.Root.new("chartdiv");
 
+        // Set themes
+        // https://www.amcharts.com/docs/v5/concepts/themes/
         root.setThemes([
             am5themes_Animated.new(root)
         ]);
 
+        // Create chart
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/
         let chart = root.container.children.push(
             am5xy.XYChart.new(root, {
-                panY: false,
                 layout: root.verticalLayout
             })
         );
 
-        // Define data
-        let data = [{
-            category: "Research",
-            value1: 1000,
-            value2: 588
-        }, {
-            category: "Marketing",
-            value1: 1200,
-            value2: 1800
-        }, {
-            category: "Sales",
-            value1: 850,
-            value2: 1230
-        }];
+        // Create axes
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 
-        // Create Y-axis
+        // Y axes
         let yAxis = chart.yAxes.push(
             am5xy.ValueAxis.new(root, {
                 renderer: am5xy.AxisRendererY.new(root, {})
             })
         );
 
-        // Create X-Axis
+        // X axis
         let xAxis = chart.xAxes.push(
-            am5xy.CategoryAxis.new(root, {
+            am5xy.CategoryDateAxis.new(root, {
                 renderer: am5xy.AxisRendererX.new(root, {}),
-                categoryField: "date"
+                categoryField: 'date'
             })
         );
-        xAxis.data.setAll(props.chartData);
+        xAxis.data.setAll(data)
 
-        // Create series
-        let series1 = chart.series.push(
-            am5xy.SmoothedXLineSeries.new(root, {
-                name: "Series",
+        // Add series
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+        for (const col of displayVariables) {
+            let series = chart.series.push(am5xy.LineSeries.new(root, {
+                name: col,
                 xAxis: xAxis,
                 yAxis: yAxis,
-                valueYField: "value",
+                valueYField: col,
                 categoryXField: "date",
-            })
-        );
-        series1.data.setAll(props.chartData);
+                legendValueText: "{valueY}"
+            }))
 
-        // let series2 = chart.series.push(
-        //     am5xy.ColumnSeries.new(root, {
-        //         name: "Series",
-        //         xAxis: xAxis,
-        //         yAxis: yAxis,
-        //         valueYField: "value2",
-        //         categoryXField: "category"
-        //     })
-        // );
-        // series2.data.setAll(data);
+            series.data.setAll(data)
+        }
 
-        let series = chart.series.push(am5xy.LineSeries.new(root, {
-            name: "Series",
-            xAxis: xAxis,
-            yAxis: yAxis,
-            valueYField: "value",
-            valueXField: "date",
-            tooltip: am5.Tooltip.new(root, {
-                labelText: "{valueY}"
-            })
+        // Add series tooltips
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Tooltips
+
+
+
+        // Add legend to axis header
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+        let legend = chart.children.push(am5.Legend.new(root, {
+            x: am5.percent(50),
+            centerX: am5.percent(50)
         }));
-
-        // Add legend
-        let legend = chart.children.push(am5.Legend.new(root, {}));
         legend.data.setAll(chart.series.values);
 
+
         // Add cursor
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
         chart.set("cursor", am5xy.XYCursor.new(root, {}));
-        chart.set("scrollbarX", am5.Scrollbar.new(root, {
-            orientation: "horizontal"
-        }));
 
-        // series.data.setAll(props.chartData);
 
+        // Add scrollbar
+        // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+
+
+        // Add Data
+
+        // For Painting Chart Updates
         chartRef.current = chart;
-
         return () => {
             root.dispose();
         };
-    }, []);
+    }, [props.chartData, props.chartVariables]);
 
     useLayoutEffect(() => {
         chartRef.current.set("paddingRight", props.paddingRight);
     }, [props.paddingRight]);
 
     return (
-        <div id="chartdiv" style={{ width: "100%", height: "400px" }}></div>
+        <div id="chartdiv" style={{ width: "100%", height: "480px" }}></div>
     );
 }

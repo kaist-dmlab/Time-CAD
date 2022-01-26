@@ -10,8 +10,9 @@ const { Header, Content, Footer } = Layout;
 // use local server to upload and then load back as json, i.e., allow both .csv .xlsx and .json ?
 function App() {
 
-  const [chartData, setChartData] = React.useState(null);
-  const [fileName, setFileName] = React.useState(null);
+  const [chartVariables, setChartVariables] = React.useState([])
+  const [chartData, setChartData] = React.useState([]);
+  const [fileName, setFileName] = React.useState("");
 
   return (
     <Layout className="layout">
@@ -22,7 +23,7 @@ function App() {
         <br />
         <div className="site-layout-content">
           {
-            chartData !== null ? <ViewWrapper chartData={chartData} fileName={fileName} setChartData={setChartData}/> : <Uploader setFileName={setFileName} setChartData={setChartData}/>
+            chartData.length > 0 ? <ViewWrapper chartData={chartData} fileName={fileName} chartVariables={chartVariables} setChartVariables={setChartVariables} setChartData={setChartData}/> : <Uploader setChartVariables={setChartVariables} setFileName={setFileName} setChartData={setChartData}/>
           }
         </div>
       </Content>

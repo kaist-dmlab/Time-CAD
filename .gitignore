@@ -31,4 +31,4 @@
 ./web_demo/yarn-error.log*
 
 ./server_demo/uploaded_files/*
-./server_demo/__pycache__
+./server_demo/__pycache__/*
