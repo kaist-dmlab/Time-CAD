@@ -54,7 +54,7 @@ export default ({ setChartData, setChartVariables, setFileName }) => {
                     <FileAddFilled />
                 </p>
                 <p className="ant-upload-text">Click or Drag a file to this area to upload.</p>
-                <p className="ant-upload-hint"><strong>Please upload <u>1 file</u> with <em>.csv, .xls, and .xlsx</em> extensions.</strong></p>
+                <p className="ant-upload-hint"><strong>Please upload <u>1 file</u> with <em>.csv, .xls, or .xlsx</em> extension.</strong></p>
                 <p className="ant-upload-hint">Your file will be immediately deleted from the server after preprocessing.</p>
             </Dragger>
         </React.Fragment>

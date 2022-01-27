@@ -2,7 +2,7 @@
 import React from 'react'
 import { Card, Col, Row, Select, Checkbox } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
-import Charts from './Charts'
+import Charts from './AntCharts'
 
 const { Option } = Select;
 const CheckboxGroup = Checkbox.Group;
@@ -93,7 +93,7 @@ export default (props) => {
                 </Card>
             </Col>
             <Col span={20}>
-                <Card title={"Displaying " + props.fileName} bordered={false} // TODO: click to show data table
+                <Card title={"Displaying " + props.fileName} bordered={false}
                     extra={
                         <Select defaultValue={currentRange} style={{ width: 172, fontWeight: 'bold' }} onChange={onRangeChange}>
                             <Option key='all' value="all"><CalendarOutlined /> All</Option>

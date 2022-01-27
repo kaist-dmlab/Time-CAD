@@ -9,10 +9,8 @@ export default (props) => {
     const chartRef = useRef(null);
 
     useLayoutEffect(() => {
-        const data = props.chartData
-        const displayVariables = props.chartVariables
-
-        console.log(displayVariables)
+        let data = props.chartData
+        let displayVariables = props.chartVariables
 
         // Create root element
         // https://www.amcharts.com/docs/v5/getting-started/#Root_element
@@ -54,7 +52,7 @@ export default (props) => {
         // Add series
         // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
         for (const col of displayVariables) {
-            let series = chart.series.push(am5xy.LineSeries.new(root, {
+            let series = chart.series.push(am5xy.SmoothedYLineSeries.new(root, {
                 name: col,
                 xAxis: xAxis,
                 yAxis: yAxis,
@@ -62,6 +60,11 @@ export default (props) => {
                 categoryXField: "date",
                 legendValueText: "{valueY}"
             }))
+
+            
+            series.data.processor = am5.DataProcessor.new(root, {
+                dateFields: ["date"]
+            });
 
             series.data.setAll(data)
         }
@@ -90,7 +93,6 @@ export default (props) => {
         // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
 
 
-        // Add Data
 
         // For Painting Chart Updates
         chartRef.current = chart;
