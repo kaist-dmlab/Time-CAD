@@ -13,17 +13,20 @@ function App() {
   const [chartVariables, setChartVariables] = React.useState([])
   const [chartData, setChartData] = React.useState([]);
   const [fileName, setFileName] = React.useState("");
-
+  const [threshold, setThreshold] = React.useState(0.0)
+  
   return (
     <Layout className="layout">
       <Header style={{ "backgroundColor": "white" }}>
-        <a href="/" className='menu-url'><div className='logo'></div>Time-CAD</a><span style={{verticalAlign: 'top'}}> Time-Series Anomaly Detection with Context-Aware Decomposition</span>
+        <a href="/" className='menu-url'><div className='logo'></div>Time-CAD</a><span style={{ verticalAlign: 'top' }}> Time-Series Anomaly Detection with Context-Aware Decomposition</span>
       </Header>
       <Content style={{ padding: '0 50px' }}>
         <br />
         <div className="site-layout-content">
           {
-            chartData.length > 0 ? <ViewWrapper chartData={chartData} fileName={fileName} chartVariables={chartVariables} setChartVariables={setChartVariables} setChartData={setChartData}/> : <Uploader setChartVariables={setChartVariables} setFileName={setFileName} setChartData={setChartData}/>
+            chartData.length > 0
+              ? <ViewWrapper threshold={threshold} chartData={chartData} fileName={fileName} chartVariables={chartVariables} setThreshold={setThreshold} setChartVariables={setChartVariables} setChartData={setChartData} />
+              : <Uploader setChartVariables={setChartVariables} setFileName={setFileName} setChartData={setChartData} setThreshold={setThreshold}/>
           }
         </div>
       </Content>

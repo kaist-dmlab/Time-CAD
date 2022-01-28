@@ -5,7 +5,7 @@ import { FileAddFilled } from '@ant-design/icons';
 
 const { Dragger } = Upload;
 
-export default ({ setChartData, setChartVariables, setFileName }) => {
+export default ({ setChartData, setChartVariables, setFileName, setThreshold }) => {
     const acceptableExts = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 
     const fileProps = {
@@ -29,6 +29,7 @@ export default ({ setChartData, setChartVariables, setFileName }) => {
                     message.success(`${info.file.name} file uploaded successfully.`);
                     setChartData(response.data)
                     setChartVariables(response.columns)
+                    setThreshold(response.threshold)
                     setFileName(info.file.name)
                 } else {
                     message.error(`${info.file.name} file format is invalid.`)
@@ -54,7 +55,7 @@ export default ({ setChartData, setChartVariables, setFileName }) => {
                     <FileAddFilled />
                 </p>
                 <p className="ant-upload-text">Click or Drag a file to this area to upload.</p>
-                <p className="ant-upload-hint"><strong>Please upload <u>1 file</u> with <em>.csv, .xls, and .xlsx</em> extensions.</strong></p>
+                <p className="ant-upload-hint"><strong>Please upload <u>1 file</u> with <em>.csv, .xls, or .xlsx</em> extension.</strong></p>
                 <p className="ant-upload-hint">Your file will be immediately deleted from the server after preprocessing.</p>
             </Dragger>
         </React.Fragment>

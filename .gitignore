@@ -30,5 +30,5 @@
 ./web_demo/yarn-debug.log*
 ./web_demo/yarn-error.log*
 
-./server_demo/uploaded_files/*
+./server_demo/train_data/*
 ./server_demo/__pycache__/*

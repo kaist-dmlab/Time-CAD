@@ -8,11 +8,12 @@ import MainViewer from './MainViewer'
 // New data uploaded through the add data button
 // More charts shown as additional files are uploaded
 // Columns shown and hidden with the toggle buttons on the left
-export default ({ chartData, fileName, chartVariables }) => {
+export default ({ chartData, fileName, chartVariables, threshold }) => {
 
     const acceptableExts = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
     const [chartDataList, setChartDataList] = React.useState([chartData])
     const [chartVariableList, setChartVariableList] = React.useState([chartVariables])
+    const [thresholdList, setThresholdList] = React.useState([threshold])
     const [fileNameList, setFileNameList] = React.useState([fileName])
 
     const fileProps = {
@@ -34,6 +35,7 @@ export default ({ chartData, fileName, chartVariables }) => {
                 if (response.status === 200) {
                     message.success(`${info.file.name} file uploaded successfully.`);
                     setChartDataList([...chartDataList, response.data])
+                    setThresholdList([...thresholdList, response.threshold])
                     setFileNameList([...fileNameList, info.file.name])
                     setChartVariableList([...chartVariableList, response.columns])
                 } else {
@@ -48,8 +50,9 @@ export default ({ chartData, fileName, chartVariables }) => {
     React.useEffect(() => {
         setChartDataList([chartData])
         setChartVariableList([chartVariables])
+        setThresholdList([threshold])
         setFileNameList([fileName])
-    }, [chartData, chartVariables, fileName]);
+    }, [chartData, chartVariables, fileName, threshold]);
 
     return (
         <React.Fragment>
@@ -59,9 +62,8 @@ export default ({ chartData, fileName, chartVariables }) => {
                     <Upload {...fileProps} accept={acceptableExts} key='add-upload'><Button size='large' key="new_data" type="primary" shape='round'><PlusOutlined />New Data</Button></Upload>,
                 ]} />
             <Row gutter={[16, 16]}>
-                {/* TODO: Action on Add New Data */}
                 {chartDataList.map((data, i) =>
-                    <MainViewer key={i} chartData={data} fileName={fileNameList[i]} chartVariables={chartVariableList[i]} />
+                    <MainViewer key={i} chartData={data} fileName={fileNameList[i]} chartVariables={chartVariableList[i]} threshold={thresholdList[i]} />
                 )}
             </Row>
         </React.Fragment>
