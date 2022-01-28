@@ -1,10 +1,15 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React from 'react'
-import { Line } from '@ant-design/plots';
+import { Line, Column } from '@ant-design/plots'
+import moment from 'moment';
 
-export default ({ chartData, setCheckedList }) => {
+export default ({ chartData, threshold }) => {
     const [data, setData] = React.useState([])
-    const [anomMarkers, setAnomMarkers] = React.useState([])
+    const [thresholdScore, setThresholdScore] = React.useState(0.0)
+    // const [labelAnnotations, setLabelAnnotations] = React.useState([])
+    // const anomalyThreshold = threshold ? threshold : 0
+    // const anomaly_scores = data.map(d => d.score)
+    // const [anomMarkers, setAnomMarkers] = React.useState([])
 
     // const onPlotReady = (plot) => {
     //     plot.on('legend-item:click', ({ view }) => {
@@ -14,97 +19,88 @@ export default ({ chartData, setCheckedList }) => {
     //         console.log(Array.from(shownColumn))
     //     });
     // };
+    let labelAnnotations = []
+    for (const d of data) {
+        if (d.label === 1) {
+            labelAnnotations.push({
+                type: 'line',
+                start: [d.date, 'min'],
+                end: [d.date, 'max'],
+                style: {
+                    stroke: 'red',
+                    strokeOpacity: 0.05
+                }
+            })
+        }
+    }
+
+    const minDate = moment(Math.min.apply(Math, data.map(o => new Date(o.date)))).format('YYYY-MM-DD HH:mm')
+    const maxDate = moment(Math.max.apply(Math, data.map(o => new Date(o.date)))).format('YYYY-MM-DD HH:mm')
+    console.log(minDate)
 
     React.useEffect(() => {
-        let anomalous_markers = []
-        setAnomMarkers(anomalous_markers)
         setData(chartData)
-    }, [chartData]);
+        setThresholdScore(threshold)
+    }, [chartData, threshold]);
 
-    const config = {
-        data: data,
+    const mainConfig = {
+        data,
         xField: 'date',
         yField: 'value',
         seriesField: 'column',
         xAxis: {
-            title: {
-                text: 'Date'
-            },
-            type: 'time',
-            tickMethod: 'time',
-            // tickCount: data.length / 12,
-            // tickLine: {
-            //     alignTick: true
-            // },
-            // label: {
-            //     autoRotate: true,
-            //     autoHide: false,
-            //     autoEllipsis: false,
-            // },
+            tickCount: 24
         },
         yAxis: {
-          title: {
-              text: 'Values'
-          }
-            // value: {
-            //     title: {
-            //         text: 'Values'
-            //     }
-            // },
-            // scores: {
-            //     title: {
-            //         text: 'Anomaly Scores'
-            //     }
-            // }
+            label: {
+                // 数值格式化为千分位
+                formatter: (v) => `${v}`.replace(/\d{1,3}(?=(\d{3})+$)/g, (s) => `${s},`),
+            },
         },
         legend: {
-            layout: 'horizontal',
-            position: 'bottom'
+            position: 'bottom',
         },
-        // geometryOptions: [
-        //     {
-        //         geometry: 'line',
-        //         seriesField: 'column',
-        //         smooth: true,
-        //     },
-        //     {
-        //         geometry: 'column',
-        //         columnWidthRatio: 1,
-        //         color: 'rgba(255,0,0,0.05)',
-        //         style: {
-        //             opacity: 0.2
-        //         }
-        //     },
-        // ],
-        // annotations: {
-        //     scores: [
-        //         {
-        //             type: 'line',
-        //             top: true,
-        //             start: ['min', 5],
-        //             end: ['max', 5],
-        //             text: {
-        //                 content: 'Anomaly Threshold',
-        //                 position: 'start',
-        //                 autoRotate: false,
-        //                 style: {
-        //                     fill: 'red',
-        //                     fontWeight: 700
-        //                 }
-        //             },
-        //             style: {
-        //                 lineWidth: 2,
-        //                 lineDash: [3, 3],
-        //                 stroke: 'red'
-        //             }
-        //         }
-        //     ]
-        // },
+        smooth: true,
+        annotations: labelAnnotations,
     };
 
-    return (
-        <React.Fragment >
-            <Line {...config} />
-        </React.Fragment >
-    )
+    const subConfig = {
+        data,
+        autoFit: false,
+        height: 100,
+        xField: 'date',
+        yField: 'score',
+        xAxis: {
+            type: 'time'
+        },
+        color: 'rgba(255, 0, 0, 0.05)',
+        columnWidthRatio: 1,
+        annotations: [
+            {
+                type: 'line',
+                start: [minDate, thresholdScore],
+                end: [maxDate, thresholdScore],
+                top: true,
+                text: {
+                    content: 'Anomaly Threshold',
+                    position: '0%',
+                    style: {
+                        textAlign: 'left',
+                        fill: 'red',
+                        fontWeight: 700
+                    },
+                },
+                style: {
+                    stroke: 'red',
+                    lineWidth: 2,
+                    lineDash: [4, 4],
+                },
+            }
+        ],
+    }
+
+    return <>
+        <Line {...mainConfig} />
+        <Column {...subConfig} />
+    </>
 }

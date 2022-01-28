@@ -5,7 +5,7 @@ import { FileAddFilled } from '@ant-design/icons';
 
 const { Dragger } = Upload;
 
-export default ({ setChartData, setChartVariables, setFileName }) => {
+export default ({ setChartData, setChartVariables, setFileName, setThreshold }) => {
     const acceptableExts = ['text/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 
     const fileProps = {
@@ -29,6 +29,7 @@ export default ({ setChartData, setChartVariables, setFileName }) => {
                     message.success(`${info.file.name} file uploaded successfully.`);
                     setChartData(response.data)
                     setChartVariables(response.columns)
+                    setThreshold(response.threshold)
                     setFileName(info.file.name)
                 } else {
                     message.error(`${info.file.name} file format is invalid.`)

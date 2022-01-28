@@ -2,6 +2,8 @@
 import React from 'react'
 import { Card, Col, Row, Select, Checkbox } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
+import moment from 'moment';
+
 import Charts from './AntCharts'
 
 const { Option } = Select;
@@ -15,7 +17,6 @@ export default (props) => {
     const [indeterminate, setIndeterminate] = React.useState(false);
     const [checkAll, setCheckAll] = React.useState(true);
     const [displayData, setDisplayData] = React.useState(props.chartData)
-
 
     React.useEffect(() => {
         setChartVariables(props.chartVariables)
@@ -47,22 +48,27 @@ export default (props) => {
 
     const onRangeChange = value => {
         let newChartData = props.chartData.filter(data => chartVariables.includes(data.column))
-
+        let maxDate = moment(Math.max.apply(Math, newChartData.map(o => new Date(o.date))))
         switch (value) {
             case '7d':
-                newChartData = newChartData.slice(-7 * chartVariables.length)
+                newChartData = newChartData.filter(data => moment(maxDate).diff(moment(data.date), 'days') <= 7)
+                // newChartData = newChartData.slice(-7 * chartVariables.length)
                 break;
             case '31d':
-                newChartData = newChartData.slice(-31 * chartVariables.length)
+                newChartData = newChartData.filter(data => moment(maxDate).diff(moment(data.date), 'days') <= 31)
+                // newChartData = newChartData.slice(-31 * chartVariables.length)
                 break;
             case '3m':
-                newChartData = newChartData.slice(-90 * chartVariables.length)
+                newChartData = newChartData.filter(data => moment(maxDate).diff(moment(data.date), 'months') <= 3)
+                // newChartData = newChartData.slice(-90 * chartVariables.length)
                 break;
             case '6m':
-                newChartData = newChartData.slice(-180 * chartVariables.length)
+                newChartData = newChartData.filter(data => moment(maxDate).diff(moment(data.date), 'months') <= 6)
+                // newChartData = newChartData.slice(-180 * chartVariables.length)
                 break;
             case '12m':
-                newChartData = newChartData.slice(-356 * chartVariables.length)
+                newChartData = newChartData.filter(data => moment(maxDate).diff(moment(data.date), 'months') <= 12)
+                // newChartData = newChartData.slice(-356 * chartVariables.length)
                 break;
             default:
                 break;
@@ -104,7 +110,7 @@ export default (props) => {
                             <Option key='12m' value="12m"><CalendarOutlined /> Last 12 months</Option>
                         </Select>
                     }>
-                    <Charts chartData={displayData} chartVariables={checkedList} setCheckedList={setCheckedList} />
+                    <Charts chartData={displayData} chartVariables={checkedList} threshold={props.threshold} setCheckedList={setCheckedList} />
                 </Card>
             </Col>
         </React.Fragment >
