@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/Time-CAD/static/css/main.14a06a75.css",
-    "main.js": "/Time-CAD/static/js/main.6f5cb439.js",
+    "main.js": "/Time-CAD/static/js/main.d154560e.js",
     "static/js/787.cd127ef9.chunk.js": "/Time-CAD/static/js/787.cd127ef9.chunk.js",
     "static/media/logo.png": "/Time-CAD/static/media/logo.09142d91c339c86c0bf9.png",
     "index.html": "/Time-CAD/index.html",
     "main.14a06a75.css.map": "/Time-CAD/static/css/main.14a06a75.css.map",
-    "main.6f5cb439.js.map": "/Time-CAD/static/js/main.6f5cb439.js.map",
+    "main.d154560e.js.map": "/Time-CAD/static/js/main.d154560e.js.map",
     "787.cd127ef9.chunk.js.map": "/Time-CAD/static/js/787.cd127ef9.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.14a06a75.css",
-    "static/js/main.6f5cb439.js"
+    "static/js/main.d154560e.js"
   ]
 }
