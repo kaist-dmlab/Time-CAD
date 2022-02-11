@@ -55,8 +55,8 @@ def compute_anomaly_scores(x, rec_x, scoring='square', x_val=None, rec_val=None)
             return (test_rec_err - mu).T * std**-1 * (test_rec_err - mu)
         
 
-def compute_metrics(anomaly_scores, labels, label_segments, n=n_thresholds, delta=240, alpha=0.65, theta=0.2, stride=1, verbose=False):
-    thresholds = _simulate_thresholds(anomaly_scores, n, verbose) 
+def compute_metrics(anomaly_scores, labels, label_segments, n=n_thresholds, delta=6*40, alpha=0.85, theta=0.15, stride=1, verbose=False):
+    thresholds = _simulate_thresholds(anomaly_scores, n, verbose)
     correct_count, correct_ratio = [], []
     precision, recall, f1 = [], [], []
     
