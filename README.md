@@ -48,9 +48,9 @@ python3 main.py
 ```
 - model: {MS-RNN CNN GRU Bi-GRU LSTM}   # designate which dataset to use.
 - dataset: {samsung, energy, kpi, IoT_modbus}
-- seed: {0, 1, 2}	# seed for 3-fold cross validation.
+- seed: {0, 1, 2}	                      # seed for 3-fold cross validation.
 - gpu_id: an integer for gpu id.
-- decomposition: {0, 1} # whether to use time series decomposition or not.
-- segmentation: {0, 1} # whether to evaluate with segmentation-based metrics or not.
+- decomposition: {0, 1}                 # whether to use time series decomposition or not.
+- segmentation: {0, 1}                  # whether to evaluate with segmentation-based metrics or not.
 e.g.) python3 main.py --seed 0 --model Bi-GRU --dataset IoT_modbus --decomposition 1 --segmentation 1 --gpu_id 0
 ```
