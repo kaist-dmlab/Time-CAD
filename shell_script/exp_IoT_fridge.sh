@@ -1,6 +1,6 @@
 for seed in 0
 do
-    for model in CNN GRU Bi-GRU LSTM
+    for model in MS-RNN CNN GRU Bi-GRU LSTM
     do
         for temporal in 0 1
         do
