@@ -25,7 +25,7 @@ Automatically detecting anomalies in massive time series has become increasingly
 
 ## 4. Configuration
 Time-CAD algorithm was implemented in **Python 3.8.12.**
-- Edit shell_script/xxxx.sh files to set experiment parameters (model, dataset, gpu_id(e.g. 0,1,2,3,4,5), etc.)
+- Edit main.py files to set experiment parameters (model, dataset, gpu_id(e.g. 0,1,2,3,4,5), etc.)
 ```
 python3 main.py
 ```
