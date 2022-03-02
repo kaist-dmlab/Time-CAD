@@ -21,7 +21,6 @@ Automatically detecting anomalies in massive time series has become increasingly
 - Ubuntu 16.04.3 LTS
 - tensorflow >= 2.5.0
 
-> After installing Node.js and Anaconda, run the following commands on your terminal `sh install.sh && run.sh` to set up dependencies and run the web application.
 
 ## 4. Configuration
 Time-CAD algorithm was implemented in **Python 3.8.12.**
