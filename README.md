@@ -43,7 +43,7 @@ python3 main.py
 --segmentation: whether to evaluate with segmentation-based metrics or not. "1" (true) or "0" (false). (integer, default: 0(false))
 ```
 
-- At current directory which has all source codes, run main.py with the parameters as follows.
+- At current directory which has all source codes, run main.py with parameters as follows.
 ```
 - model: {MS-RNN CNN GRU Bi-GRU LSTM}   # designate which dataset to use.
 - dataset: {samsung, energy, kpi, IoT_modbus}
