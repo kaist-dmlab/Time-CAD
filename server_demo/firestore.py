@@ -29,39 +29,49 @@ class Firestore:
             if change.type.name == 'ADDED':
                 print(f'<=== ARRIVAL: \t{change.document.id}')
 
-    def get_full_data(self, id_name) -> pd.DataFrame:
+    def get_full_data(self, id_name, start: datetime = None, end: datetime = None) -> pd.DataFrame:
         """ Read full data from Firestore as dataframe.
 
         :param id_name: the field to use as the id
+        :param start: the starting datetime to query
+        :param end: the ending datetime to query
         :return: a pandas dataframe that contains full data
         """
-
-        docs = self.db.collection(self.collection_path).stream()
+        ref = self.db.collection(self.collection_path)
+        if start is not None:
+            ref = ref.where('unix_timestamp', '>', start.strftime('%s'))
+        if end is not None:
+            ref = ref.where('unix_timestamp', '<', end.strftime('%s'))
+        docs = ref.stream()
         lst = []
         for doc in docs:
             d = doc.to_dict()
-            d[id_name] = doc.id
             lst.append(d)
         df = pd.DataFrame(lst)
         print(f"Successful Firestore stream response. Size: {len(df)}")
         print(df.head())
         return df
 
-    def add_data(self, data: dict):
+    def add_data(self, data: dict, id_name: str):
         """ Add data to Firestore in dictionary form.
 
         :param data: data to add
+        :param id_name: the name of key to use as id
         """
+        assert id_name in data.keys()
 
-        self.db.collection(self.collection_path).document(data['timestamp']).set(data)
-        print(f"===> PUSH: \t\t{data}")
+        doc_id = data[id_name]
+        # del data[id_name]
+        self.db.collection(self.collection_path).document(doc_id).set(data)
+        print(f"===> PUSH: \t\t{doc_id}-{data}")
 
     def simulate(self):
         """ Simulate data push and listen."""
         for i in range(100):
-            data = {'timestamp': datetime.now().strftime('%b. %d %X'), 'value': i * 100}
+            now = datetime.now()
+            data = {'unix_timestamp': now.strftime('%s'), 'pretty_timestamp': now.strftime('%b. %d %X'), 'value': i * 100}
             time.sleep(2)
-            self.add_data(data)
+            self.add_data(data, 'unix_timestamp')
 
         self.db_watch.unsubscribe()
 
@@ -69,3 +79,4 @@ class Firestore:
 if __name__ == "__main__":
     firestore = Firestore()
     firestore.simulate()
+    # firestore.get_full_data('timestamp', end=datetime.now())
