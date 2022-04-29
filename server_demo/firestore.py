@@ -29,10 +29,9 @@ class Firestore:
             if change.type.name == 'ADDED':
                 print(f'<=== ARRIVAL: \t{change.document.id}')
 
-    def get_full_data(self, id_name, start: datetime = None, end: datetime = None) -> pd.DataFrame:
+    def get_full_data(self, start: datetime = None, end: datetime = None) -> pd.DataFrame:
         """ Read full data from Firestore as dataframe.
 
-        :param id_name: the field to use as the id
         :param start: the starting datetime to query
         :param end: the ending datetime to query
         :return: a pandas dataframe that contains full data
