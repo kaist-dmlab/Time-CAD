@@ -5,6 +5,10 @@ import firebase_admin
 import pandas as pd
 from firebase_admin import credentials, firestore
 
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 2000)
+
 
 class Firestore:
     def __init__(self):
@@ -64,6 +68,19 @@ class Firestore:
         self.db.collection(self.collection_path).document(doc_id).set(data)
         print(f"===> PUSH: \t\t{doc_id}-{data}")
 
+    def upload_data(self, path: str, dev=False):
+        df = pd.read_csv(path)
+        print(len(df))
+        if dev:
+            anomaly_df = df[df['label'] == 1].sample(n=30)
+            print(len(anomaly_df))
+            sampled_df = df.sample(n=30)
+            df = pd.concat([anomaly_df, sampled_df])
+            df = df.sort_values(by='date')
+        print(df)
+        for row in df.to_dict('records'):
+            self.add_data(row, 'date')
+
     def simulate(self):
         """ Simulate data push and listen."""
         for i in range(100):
@@ -77,5 +94,6 @@ class Firestore:
 
 if __name__ == "__main__":
     firestore = Firestore()
-    firestore.simulate()
+    # firestore.simulate()
+    firestore.upload_data('A_slice.csv', dev=True)
     # firestore.get_full_data('timestamp', end=datetime.now())
