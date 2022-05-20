@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 
 import firebase_admin
+import numpy as np
 import pandas as pd
 from firebase_admin import credentials, firestore
 
@@ -77,6 +78,9 @@ class Firestore:
             sampled_df = df.sample(n=30)
             df = pd.concat([anomaly_df, sampled_df])
             df = df.sort_values(by='date')
+            for col in df.columns:
+                if col not in ['date', 'label']:
+                    df[f'label_{col}'] = np.random.choice(a=[0, 1], size=(len(df),))
         print(df)
         for row in df.to_dict('records'):
             self.add_data(row, 'date')
