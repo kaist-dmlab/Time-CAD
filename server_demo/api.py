@@ -1,5 +1,9 @@
+from math import floor, ceil
 from typing import List
+
+import numpy as np
 import pandas as pd
+from scipy.stats import pearsonr
 
 from server_demo.firestore import Firestore
 
@@ -45,30 +49,123 @@ def weekly_chart():
     return result
 
 
-def close_pattern_of_variable(variable_name: str, anomaly_timestamp: str, interval: int, count: int) -> List[List[dict]]:
+def main_chart(length: int):
+    """
+    :param length: length of data in timestamps to request
+    :return: most recent {length} timestamps of data
+    """
+    firestore = Firestore()
+    df = firestore.get_full_data()
+    df = df.tail(length)
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
+    data = df.to_dict(orient='list')
+    result = []
+    for idx in range(len(data['date'])):
+        for v in var_columns:
+            d = {
+                'date': data['date'][idx],
+                'value': data[v][idx],
+                'name': v,
+                'score': data[f'score_{v}'][idx],
+                'label': data[f'label_{v}'][idx]
+            }
+            result.append(d)
+    print(result)
+    return result
+
+
+def anomaly_score_chart(length: int):
+    """
+    :param length: length of data in timestamps to request
+    :return: most recent {length} timestamps of data
+    """
+    firestore = Firestore()
+    df = firestore.get_full_data()
+    df = df.tail(length)
+    df = df[['date', 'score']]
+    print(df.to_dict(orient='records'))
+    return df.to_dict(orient='records')
+
+
+def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: int, count: int) -> List[dict]:
     """
     :param variable_name: name of the variable to search for
     :param anomaly_timestamp: timestamp of the anomaly to find similar patterns for
     :param interval: length of each pattern found
     :param count: the number of similar patterns to find
-    :return: an array of similar patterns as a list of list of rows
+    :return: an array of similar patterns as a list of rows
     """
     firestore = Firestore()
     df = firestore.get_full_data()
-    result = df.iloc[0:interval, variable_name]
+    df = df[['date', variable_name, f'label_{variable_name}']]
+    print(df)
 
-    return [result.to_dict('records')]
+    anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
+    anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
+    if anomaly_range[0] < 0:
+        anomaly_range[1] = anomaly_range[1] - anomaly_range[0]
+        anomaly_range[0] = max(0, anomaly_range[0])
+    elif anomaly_range[1] >= len(df):
+        anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
+        anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
+    anomaly = df.loc[anomaly_range[0]:anomaly_range[1], variable_name]
+    print(anomaly)
+    df['corr'] = df[variable_name].rolling(interval).apply(lambda r: pearsonr(r, anomaly)[0])
+    order = np.argsort(df['corr'].tolist())[::-1]
+    order = order[interval:interval + count]
+    print(order)
+
+    result = []
+    for idx in order:
+        match = df[idx - interval + 1: idx + 1].copy()
+        match['range'] = f'{match["date"].iloc[0]}-{match["date"].iloc[-1]}'
+        match['name'] = variable_name
+        match.rename(columns={variable_name: 'value', f'label_{variable_name}': 'label'}, inplace=True)
+        match.drop('corr', axis=1, inplace=True)
+        print(match)
+        data = match.to_dict('records')
+        print(data)
+        result.extend(data)
+    print(result)
+    return result
 
 
-def close_pattern_in_past(anomaly_timestamp: str, interval: int) -> List[dict]:
+def possible_outliers(anomaly_timestamp: str, interval: int) -> List[dict]:
     """
-
-    :param anomaly_timestamp: timestamp of the anomaly to find similar patterns for
-    :param interval: length of the pattern found
+    :param anomaly_timestamp: timestamp of the anomaly to calculate outliers for
+    :param interval: length of the data for box/violin plot
     :return: the close pattern found as a list of rows
     """
     firestore = Firestore()
     df = firestore.get_full_data()
-    result = df.iloc[0:interval]
+    print(df)
+    anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
+    anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
+    if anomaly_range[0] < 0:
+        anomaly_range[1] = anomaly_range[1] - anomaly_range[0]
+        anomaly_range[0] = max(0, anomaly_range[0])
+    elif anomaly_range[1] >= len(df):
+        anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
+        anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
+    anomaly = df.loc[anomaly_range[0]:anomaly_range[1]]
+    print(anomaly)
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
 
-    return result.to_dict('records')
+    result = []
+    for row in anomaly.to_dict('records'):
+        for v in var_columns:
+            data = {
+                'name': v,
+                'value': row[v]
+            }
+            result.append(data)
+    print(result)
+    return result
+
+
+def score_heatmap(length: int):
+    """
+    :param length: length of data in timestamps to request
+    :return: most recent {length} timestamps of data
+    """
+    pass

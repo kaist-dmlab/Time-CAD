@@ -81,6 +81,9 @@ class Firestore:
             for col in df.columns:
                 if col not in ['date', 'label']:
                     df[f'label_{col}'] = np.random.choice(a=[0, 1], size=(len(df),))
+                    df[f'score_{col}'] = np.random.random(size=(len(df),))
+            df['score'] = np.random.random(size=(len(df),))
+
         print(df)
         for row in df.to_dict('records'):
             self.add_data(row, 'date')
