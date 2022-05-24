@@ -168,4 +168,28 @@ def score_heatmap(length: int):
     :param length: length of data in timestamps to request
     :return: most recent {length} timestamps of data
     """
-    pass
+    firestore = Firestore()
+    df = firestore.get_full_data()
+    df = df.tail(length)
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
+
+    df['score_avg'] = df[[f'score_{v}' for v in var_columns]].mean(axis=1)
+    print(df)
+
+    result = []
+    for row in df.to_dict('records'):
+        for v in var_columns:
+            data = {
+                'date': row['date'],
+                'score': row[f'score_{v}'],
+                'name': v
+            }
+            result.append(data)
+        data = {
+            'date': row['date'],
+            'score': row['score_avg'],
+            'name': 'Overall'
+        }
+        result.append(data)
+    print(result)
+    return result
