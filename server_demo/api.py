@@ -8,20 +8,25 @@ from scipy.stats import pearsonr
 from server_demo.firestore import Firestore
 
 
-def stats():
+def stats(length: int):
+    """
+    :param length: the length of timestamps to calculate percent changes
+    :return: the count and percent change of anomalies
+    """
     firestore = Firestore()
     df = firestore.get_full_data()
-    result = {}
-    for var in df.columns:
-        if not var.startswith('label') and var not in ['date']:
-            result[var] = df[f'label_{var}'].sum()
+    current_df = df.tail(length)
+    past_df = df.iloc[-2 * length:-length]
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
+    result = {var: df[f'label_{var}'].sum() for var in var_columns}
+
     return {
         'total': {
             'n': df['label'].sum(),
-            'percent': df['label'].sum() / len(df)
+            'percent': (current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100
         },
         'variable': [
-            {'name': k, 'n': v, 'percent': v / sum(result.values()) * 100} for k, v in result.items()
+            {'name': k, 'n': v, 'percent': (current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100} for k, v in result.items()
         ]
     }
 
