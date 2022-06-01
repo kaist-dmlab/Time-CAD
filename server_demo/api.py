@@ -222,3 +222,15 @@ def score_heatmap(length: int):
         result.append(data)
     print(result)
     return result
+
+
+def anomaly_details(variable_name: str, anomaly_timestamp: str, interval: int, count: int):
+    close_patterns = close_pattern_chart(variable_name, anomaly_timestamp, interval, count)
+    outliers = possible_outliers(anomaly_timestamp, interval)
+    data = {
+        'anomaly_id': anomaly_timestamp,
+        'close_patterns': close_patterns,
+        'possible_outliers': outliers
+    }
+    firestore = Firestore()
+    firestore.add_anomaly_details(anomaly_timestamp, data)

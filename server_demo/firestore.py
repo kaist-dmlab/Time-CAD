@@ -78,6 +78,15 @@ class Firestore:
         self.db.collection('stats').document(doc_id).set(data)
         print(f"===> PUSH: \t\t{data}")
 
+    def add_anomaly_details(self, id: str, data: dict):
+        """ Add anomaly details data to Firestore in dictionary form.
+
+        :param id: id of the anomaly
+        :param data: data to add
+        """
+        self.db.collection('anomaly_details').document(id).set(data)
+        print(f"===> PUSH: \t\t{data}")
+
     def upload_data(self, path: str, dev=False):
         df = pd.read_csv(path)
         print(len(df))
