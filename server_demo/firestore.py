@@ -69,6 +69,15 @@ class Firestore:
         self.db.collection(self.collection_path).document(doc_id).set(data)
         print(f"===> PUSH: \t\t{doc_id}-{data}")
 
+    def add_stats(self, data: dict):
+        """ Add main stats data to Firestore in dictionary form.
+
+        :param data: data to add
+        """
+        doc_id = datetime.now().strftime('%s')
+        self.db.collection('stats').document(doc_id).set(data)
+        print(f"===> PUSH: \t\t{data}")
+
     def upload_data(self, path: str, dev=False):
         df = pd.read_csv(path)
         print(len(df))
