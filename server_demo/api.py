@@ -22,7 +22,7 @@ def stats(length: int):
 
     return {
         'total': {
-            'n': int(df['label'].sum()),
+            'n': int(current_df['label'].sum()),
             'percent': float((current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100) if past_df['label'].sum() else 0
         },
         'variable': [
