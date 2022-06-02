@@ -22,18 +22,23 @@ def stats(length: int):
 
     return {
         'total': {
-            'n': df['label'].sum(),
-            'percent': (current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100
+            'n': int(df['label'].sum()),
+            'percent': float((current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100)
         },
         'variable': [
-            {'name': k, 'n': v, 'percent': (current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100} for k, v in result.items()
+            {'name': k, 'n': int(v), 'percent': float((current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100)} for k, v in result.items()
         ]
     }
 
 
-def hourly_chart():
+def hourly_chart(length: int):
+    """
+    :param length: length of data in timestamps to calculate
+    :return: the hourly count of anomalies
+    """
     firestore = Firestore()
     df = firestore.get_full_data()
+    df = df.tail(length)
     df = df[df['label'] == 1]
     df['date'] = pd.to_datetime(df['date'])
     df['hour'] = df['date'].dt.hour
@@ -42,9 +47,14 @@ def hourly_chart():
     return result
 
 
-def weekly_chart():
+def weekly_chart(length: int):
+    """
+    :param length: length of data in timestamps to calculate
+    :return: the weekly count of anomalies
+    """
     firestore = Firestore()
     df = firestore.get_full_data()
+    df = df.tail(length)
     df = df[df['label'] == 1]
     df['date'] = pd.to_datetime(df['date'])
     df['day_of_week'] = df['date'].dt.day_name()
@@ -52,6 +62,20 @@ def weekly_chart():
     result = [{'time': k, 'value': v} for k, v in result.to_dict().items()]
     print(result)
     return result
+
+
+def full_stats(length: int):
+    variable_stats = stats(length)
+    hourly_stats = hourly_chart(length)
+    weekly_stats = weekly_chart(length)
+    data = {
+        'stats': variable_stats,
+        'hourly': hourly_stats,
+        'weekly': weekly_stats
+    }
+    print(data)
+    firestore = Firestore()
+    firestore.add_stats(data)
 
 
 def main_chart(length: int):
@@ -198,3 +222,15 @@ def score_heatmap(length: int):
         result.append(data)
     print(result)
     return result
+
+
+def anomaly_details(variable_name: str, anomaly_timestamp: str, interval: int, count: int):
+    close_patterns = close_pattern_chart(variable_name, anomaly_timestamp, interval, count)
+    outliers = possible_outliers(anomaly_timestamp, interval)
+    data = {
+        'anomaly_id': anomaly_timestamp,
+        'close_patterns': close_patterns,
+        'possible_outliers': outliers
+    }
+    firestore = Firestore()
+    firestore.add_anomaly_details(anomaly_timestamp, data)

@@ -17,7 +17,7 @@ class Firestore:
         try:
             firebase_admin.get_app()
         except ValueError:
-            firebase_admin.initialize_app(credentials.Certificate("time-cad-firebase-adminsdk-prm3h-81e63119b0.json"))
+            firebase_admin.initialize_app(credentials.Certificate("time-cad-v2-firebase-adminsdk-9xwe3-437da1ee87.json"))
         self.db = firestore.client()
         self.db_watch = self.db.collection(self.collection_path).on_snapshot(self.on_arrival)
 
@@ -68,6 +68,24 @@ class Firestore:
         # del data[id_name]
         self.db.collection(self.collection_path).document(doc_id).set(data)
         print(f"===> PUSH: \t\t{doc_id}-{data}")
+
+    def add_stats(self, data: dict):
+        """ Add main stats data to Firestore in dictionary form.
+
+        :param data: data to add
+        """
+        doc_id = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.db.collection('main_stats').document(doc_id).set(data)
+        print(f"===> PUSH: \t\t{data}")
+
+    def add_anomaly_details(self, id: str, data: dict):
+        """ Add anomaly details data to Firestore in dictionary form.
+
+        :param id: id of the anomaly
+        :param data: data to add
+        """
+        self.db.collection('anomaly_details').document(id).set(data)
+        print(f"===> PUSH: \t\t{data}")
 
     def upload_data(self, path: str, dev=False):
         df = pd.read_csv(path)
