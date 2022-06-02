@@ -78,44 +78,6 @@ def full_stats(length: int):
     firestore.add_stats(data)
 
 
-def main_chart(length: int):
-    """
-    :param length: length of data in timestamps to request
-    :return: most recent {length} timestamps of data
-    """
-    firestore = Firestore()
-    df = firestore.get_full_data()
-    df = df.tail(length)
-    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
-    data = df.to_dict(orient='list')
-    result = []
-    for idx in range(len(data['date'])):
-        for v in var_columns:
-            d = {
-                'date': data['date'][idx],
-                'value': data[v][idx],
-                'name': v,
-                'score': data[f'score_{v}'][idx],
-                'label': data[f'label_{v}'][idx]
-            }
-            result.append(d)
-    print(result)
-    return result
-
-
-def anomaly_score_chart(length: int):
-    """
-    :param length: length of data in timestamps to request
-    :return: most recent {length} timestamps of data
-    """
-    firestore = Firestore()
-    df = firestore.get_full_data()
-    df = df.tail(length)
-    df = df[['date', 'score']]
-    print(df.to_dict(orient='records'))
-    return df.to_dict(orient='records')
-
-
 def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: int, count: int) -> List[dict]:
     """
     :param variable_name: name of the variable to search for
