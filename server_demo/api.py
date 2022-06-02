@@ -26,7 +26,7 @@ def stats(length: int):
             'percent': float((current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100) if past_df['label'].sum() else 0
         },
         'variable': [
-            {'name': k, 'n': int(v), 'percent': float((current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100 if past_df['label'].sum() else 0)} for k, v in result.items()
+            {'name': k, 'n': int(v), 'percent': float((current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100) if past_df[f'label_{k}'].sum() else 0} for k, v in result.items()
         ]
     }
 
