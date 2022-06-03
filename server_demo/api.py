@@ -111,6 +111,7 @@ def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: in
         match = df[idx - interval + 1: idx + 1].copy()
         match['range'] = f'{match["date"].iloc[0]}-{match["date"].iloc[-1]}'
         match['name'] = variable_name
+        match['date'] = range(len(match))
         match.rename(columns={variable_name: 'value', f'label_{variable_name}': 'label'}, inplace=True)
         match.drop('corr', axis=1, inplace=True)
         print(match)
