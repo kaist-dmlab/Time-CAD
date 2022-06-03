@@ -99,14 +99,22 @@ def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: in
     elif anomaly_range[1] >= len(df):
         anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
         anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
-    anomaly = df.loc[anomaly_range[0]:anomaly_range[1], variable_name]
+    anomaly = df.loc[anomaly_range[0]:anomaly_range[1]].copy()
     print(anomaly)
-    df['corr'] = df[variable_name].rolling(interval).apply(lambda r: pearsonr(r, anomaly)[0])
+    df['corr'] = df[variable_name].rolling(interval).apply(lambda r: pearsonr(r, anomaly[variable_name])[0])
     order = np.argsort(df['corr'].tolist())[::-1]
     order = order[interval:interval + count]
     print(order)
 
     result = []
+
+    anomaly['range'] = 'anomaly'
+    anomaly['name'] = variable_name
+    anomaly['date'] = range(len(anomaly))
+    anomaly.rename(columns={variable_name: 'value', f'label_{variable_name}': 'label'}, inplace=True)
+    data = anomaly.to_dict('records')
+    result.extend(data)
+
     for idx in order:
         match = df[idx - interval + 1: idx + 1].copy()
         match['range'] = f'{match["date"].iloc[0]}-{match["date"].iloc[-1]}'
@@ -129,7 +137,7 @@ def past_close_patterns(anomaly_timestamp: str, interval: int) -> List[dict]:
     :return: a list of points in the close pattern
     """
     firestore = Firestore()
-    df = firestore.get_full_data().head(100)
+    df = firestore.get_full_data()
 
     anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
     anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
