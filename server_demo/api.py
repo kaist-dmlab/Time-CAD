@@ -197,11 +197,12 @@ def possible_outliers(anomaly_timestamp: str, interval: int) -> List[dict]:
     result = []
     for row in anomaly.to_dict('records'):
         for v in var_columns:
-            data = {
-                'name': v,
-                'value': row[v]
-            }
-            result.append(data)
+            if row[f'label_{v}'] == 1:
+                data = {
+                    'name': v,
+                    'value': row[v]
+                }
+                result.append(data)
     print(result)
     return result
 
