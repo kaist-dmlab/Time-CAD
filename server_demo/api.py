@@ -121,6 +121,58 @@ def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: in
     return result
 
 
+def past_close_patterns(anomaly_timestamp: str, interval: int) -> List[dict]:
+    """
+    :param anomaly_timestamp: timestamp of the anomaly to find close patterns for
+    :param interval: length of each pattern found
+    :return: a list of points in the close pattern
+    """
+    firestore = Firestore()
+    df = firestore.get_full_data().head(100)
+
+    anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
+    anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
+    if anomaly_range[0] < 0:
+        anomaly_range[1] = anomaly_range[1] - anomaly_range[0]
+        anomaly_range[0] = max(0, anomaly_range[0])
+    elif anomaly_range[1] >= len(df):
+        anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
+        anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
+    anomaly = df.loc[anomaly_range[0]:anomaly_range[1], var_columns]
+    print('anomaly', anomaly)
+
+    for var in var_columns:
+        df[f'corr_{var}'] = df[var].rolling(interval).apply(lambda r: pearsonr(r, anomaly[var])[0])
+    # correlation is the mean of the correlations for each variable
+    df['corr'] = df[[f'corr_{var}' for var in var_columns]].mean(axis=1)
+
+    order = np.argsort(df['corr'].tolist())[::-1]
+    order = order[interval:]  # ignore first few nans
+    order = [idx for idx in order if idx < anomaly_range[0]]  # only take the patterns before the anomaly
+    print(order)
+
+    result = []
+
+    max_idx = order[0]
+    match = df[max_idx - interval + 1: max_idx + 1].copy()
+    match['range'] = f'{match["date"].iloc[0]}-{match["date"].iloc[-1]}'
+    print(match)
+
+    for var in var_columns:
+        var_df = match[[v for v in match.columns if v.endswith(var)] + ['date', 'range']].copy()
+        var_df.drop(f'corr_{var}', axis=1, inplace=True)
+        var_df.rename(columns={var: 'value', f'label_{var}': 'label', f'score_{var}': 'score'}, inplace=True)
+        var_df['name'] = var
+        print(var_df)
+        data = var_df.to_dict('records')
+        print(data)
+        result.extend(data)
+
+    print(result)
+    return result
+
+
 def possible_outliers(anomaly_timestamp: str, interval: int) -> List[dict]:
     """
     :param anomaly_timestamp: timestamp of the anomaly to calculate outliers for
