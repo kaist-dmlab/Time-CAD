@@ -22,11 +22,11 @@ def stats(length: int):
 
     return {
         'total': {
-            'n': int(df['label'].sum()),
-            'percent': float((current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100)
+            'n': int(current_df['label'].sum()),
+            'percent': float((current_df['label'].sum() - past_df['label'].sum()) / past_df['label'].sum() * 100) if past_df['label'].sum() else 0
         },
         'variable': [
-            {'name': k, 'n': int(v), 'percent': float((current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100)} for k, v in result.items()
+            {'name': k, 'n': int(v), 'percent': float((current_df[f'label_{k}'].sum() - past_df[f'label_{k}'].sum()) / past_df[f'label_{k}'].sum() * 100) if past_df[f'label_{k}'].sum() else 0} for k, v in result.items()
         ]
     }
 
@@ -78,44 +78,6 @@ def full_stats(length: int):
     firestore.add_stats(data)
 
 
-def main_chart(length: int):
-    """
-    :param length: length of data in timestamps to request
-    :return: most recent {length} timestamps of data
-    """
-    firestore = Firestore()
-    df = firestore.get_full_data()
-    df = df.tail(length)
-    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
-    data = df.to_dict(orient='list')
-    result = []
-    for idx in range(len(data['date'])):
-        for v in var_columns:
-            d = {
-                'date': data['date'][idx],
-                'value': data[v][idx],
-                'name': v,
-                'score': data[f'score_{v}'][idx],
-                'label': data[f'label_{v}'][idx]
-            }
-            result.append(d)
-    print(result)
-    return result
-
-
-def anomaly_score_chart(length: int):
-    """
-    :param length: length of data in timestamps to request
-    :return: most recent {length} timestamps of data
-    """
-    firestore = Firestore()
-    df = firestore.get_full_data()
-    df = df.tail(length)
-    df = df[['date', 'score']]
-    print(df.to_dict(orient='records'))
-    return df.to_dict(orient='records')
-
-
 def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: int, count: int) -> List[dict]:
     """
     :param variable_name: name of the variable to search for
@@ -155,6 +117,58 @@ def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: in
         data = match.to_dict('records')
         print(data)
         result.extend(data)
+    print(result)
+    return result
+
+
+def past_close_patterns(anomaly_timestamp: str, interval: int) -> List[dict]:
+    """
+    :param anomaly_timestamp: timestamp of the anomaly to find close patterns for
+    :param interval: length of each pattern found
+    :return: a list of points in the close pattern
+    """
+    firestore = Firestore()
+    df = firestore.get_full_data().head(100)
+
+    anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
+    anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
+    if anomaly_range[0] < 0:
+        anomaly_range[1] = anomaly_range[1] - anomaly_range[0]
+        anomaly_range[0] = max(0, anomaly_range[0])
+    elif anomaly_range[1] >= len(df):
+        anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
+        anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
+    var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
+    anomaly = df.loc[anomaly_range[0]:anomaly_range[1], var_columns]
+    print('anomaly', anomaly)
+
+    for var in var_columns:
+        df[f'corr_{var}'] = df[var].rolling(interval).apply(lambda r: pearsonr(r, anomaly[var])[0])
+    # correlation is the mean of the correlations for each variable
+    df['corr'] = df[[f'corr_{var}' for var in var_columns]].mean(axis=1)
+
+    order = np.argsort(df['corr'].tolist())[::-1]
+    order = order[interval:]  # ignore first few nans
+    order = [idx for idx in order if idx < anomaly_range[0]]  # only take the patterns before the anomaly
+    print(order)
+
+    result = []
+
+    max_idx = order[0]
+    match = df[max_idx - interval + 1: max_idx + 1].copy()
+    match['range'] = f'{match["date"].iloc[0]}-{match["date"].iloc[-1]}'
+    print(match)
+
+    for var in var_columns:
+        var_df = match[[v for v in match.columns if v.endswith(var)] + ['date', 'range']].copy()
+        var_df.drop(f'corr_{var}', axis=1, inplace=True)
+        var_df.rename(columns={var: 'value', f'label_{var}': 'label', f'score_{var}': 'score'}, inplace=True)
+        var_df['name'] = var
+        print(var_df)
+        data = var_df.to_dict('records')
+        print(data)
+        result.extend(data)
+
     print(result)
     return result
 
