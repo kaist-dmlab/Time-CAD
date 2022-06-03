@@ -206,21 +206,32 @@ def possible_outliers(anomaly_timestamp: str, interval: int) -> List[dict]:
     return result
 
 
-def score_heatmap(length: int):
+def score_heatmap(anomaly_timestamp: str, interval: int):
     """
-    :param length: length of data in timestamps to request
+    :param anomaly_timestamp: timestamp of the anomaly to calculate for
+    :param interval: length of data in timestamps to request
     :return: most recent {length} timestamps of data
     """
     firestore = Firestore()
     df = firestore.get_full_data()
-    df = df.tail(length)
+
+    anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
+    anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
+    if anomaly_range[0] < 0:
+        anomaly_range[1] = anomaly_range[1] - anomaly_range[0]
+        anomaly_range[0] = max(0, anomaly_range[0])
+    elif anomaly_range[1] >= len(df):
+        anomaly_range[0] = anomaly_range[0] - (anomaly_range[1] - len(df) + 1)
+        anomaly_range[1] = min(anomaly_range[1], len(df) - 1)
+    anomaly_df = df.loc[anomaly_range[0]:anomaly_range[1]].copy()
+
     var_columns = [c for c in df.columns if (not c.startswith('label') and not c.startswith('score') and c not in ['date'])]
 
-    df['score_avg'] = df[[f'score_{v}' for v in var_columns]].mean(axis=1)
-    print(df)
+    anomaly_df['score_avg'] = anomaly_df[[f'score_{v}' for v in var_columns]].mean(axis=1)
+    print(anomaly_df)
 
     result = []
-    for row in df.to_dict('records'):
+    for row in anomaly_df.to_dict('records'):
         for v in var_columns:
             data = {
                 'date': row['date'],
