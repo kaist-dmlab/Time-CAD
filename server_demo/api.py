@@ -89,6 +89,8 @@ def close_pattern_chart(variable_name: str, anomaly_timestamp: str, interval: in
     firestore = Firestore()
     df = firestore.get_full_data()
     df = df[['date', variable_name, f'label_{variable_name}']]
+    if len(df) < interval:
+        raise Exception(f'Not enough data to find close patterns. Need at least {interval} points. Currently {len(df)}')
     print(df)
 
     anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
@@ -138,6 +140,8 @@ def past_close_patterns(anomaly_timestamp: str, interval: int) -> List[dict]:
     """
     firestore = Firestore()
     df = firestore.get_full_data()
+    if len(df) < interval:
+        raise Exception(f'Not enough data to find close patterns. Need at least {interval} points. Currently {len(df)}')
 
     anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
     anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
@@ -190,6 +194,8 @@ def possible_outliers(anomaly_timestamp: str, interval: int) -> List[dict]:
     """
     firestore = Firestore()
     df = firestore.get_full_data()
+    if len(df) < interval:
+        raise Exception(f'Not enough data to find outliers. Need at least {interval} points. Currently {len(df)}')
     print(df)
     anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
     anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
@@ -224,6 +230,8 @@ def score_heatmap(anomaly_timestamp: str, interval: int):
     """
     firestore = Firestore()
     df = firestore.get_full_data()
+    if len(df) < interval:
+        raise Exception(f'Not enough data to calculate heatmap. Need at least {interval} points. Currently {len(df)}')
 
     anomaly_idx = df.index[df['date'] == anomaly_timestamp][0]
     anomaly_range = [anomaly_idx - floor((interval - 1) / 2), anomaly_idx + ceil((interval - 1) / 2)]
