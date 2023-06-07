@@ -1,5 +1,5 @@
 # Time-CAD
-# Time-Series Anomaly Detection with Context-Aware Decomposition
+# Context-Aware Deep Time-Series Decomposition for Anomaly Detection in Businesses
 
 ## 1. Overview
 Automatically detecting anomalies in massive time series has become increasingly challenging as data collection technology developed, especially in communication services. Time-series decomposition can reveal underlying time series patterns, such as trends and seasonality. However, previous decomposition-based anomaly detectors did not take temporal auxiliary information (e.g., holidays) into account, limiting their ability to respond to contextual cases. For example, a sharp increase in the value of a given variable might be normal on holidays but abnormal on weekdays. This study proposes a framework for detecting anomalies through deep time-series decomposition by exploiting temporal auxiliary information. To verify the effectiveness of the proposed framework, we conduct thorough experiments on both real-world public and proprietary datasets. The results empirically ascertain that detecting anomalies using the residuals from context-based decomposition improves the performance by up to 2.1 times in time-series aware F1 score.
