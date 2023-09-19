@@ -1,5 +1,18 @@
-# Time-CAD
-# Context-Aware Deep Time-Series Decomposition for Anomaly Detection in Businesses
+# Time-CAD: Context-Aware Deep Time-Series Decomposition for Anomaly Detection in Businesses
+
+This is the implementation of a paper published in ECML PKDD 2023 (ADS Track) [[Paper](https://link.springer.com/chapter/10.1007/978-3-031-43427-3_20)] [[Poster]()] [[Presentation]()]
+
+
+## 0. Citation
+```
+@inproceedings{TimeCAD_ECMLPKDD_23,
+  title={Context-Aware Deep Time-Series Decomposition for Anomaly Detection in Businesses},
+  author={Nam, Youngeun and Trirat, Patara and Kim, Taeyoon and Lee, Youngseop and Lee, Jae-Gil},
+  booktitle={Proceedings of the 2023 Joint European Conference on Machine Learning and Knowledge Discovery in Databases},
+  pages={330--345},
+  year={2023}
+}
+```
 
 ## 1. Overview
 Detecting anomalies in time series has become increasingly challenging as data collection technology develops, especially in realworld communication services, which require contextual information for precise prediction. To address this challenge, researchers usually use time-series decomposition to reveal underlying patterns, e.g., trends and seasonality. However, existing decomposition-based anomaly detectors do not explicitly consider such *contextual information*, limiting their ability to correctly detect contextual cases. This paper proposes *Time-CAD*, a new *context-aware deep* time-series decomposition framework to detect anomalies for a more practical scenario in real-world businesses. We verify the effectiveness of the novel design for integrating contextual information into deep time-series decomposition through extensive experiments on four real-world benchmarks, demonstrating improvements of up to 46% in time-series aware $F_1$ score on average.
