@@ -1,6 +1,6 @@
 # Time-CAD: Context-Aware Deep Time-Series Decomposition for Anomaly Detection in Businesses
 
-This is the implementation of a paper published in ECML PKDD 2023 (ADS Track) [[Paper](https://link.springer.com/chapter/10.1007/978-3-031-43427-3_20)] [[Poster]()] [[Presentation]()]
+This is the implementation of a paper published in ECML PKDD 2023 (ADS Track) [[Paper](https://link.springer.com/chapter/10.1007/978-3-031-43427-3_20)] [[Poster](https://drive.google.com/file/d/1pc9TtAlnm-RbeQlwgsc2eMNIMLUwDsmN/view?usp=drive_link)] [[Presentation](https://drive.google.com/file/d/1pxG7E8gIt9thUaMg37d-IHHf_w9xY2bn/view?usp=drive_link)]
 
 
 ## 0. Citation
